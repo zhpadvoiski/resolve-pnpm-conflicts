@@ -33,9 +33,6 @@ jobs:
       - name: Authenticate with GitHub CLI
         run: gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
 
-      - name: Log git config
-        run: git config --list --show-origin
-
 #      - name: Setup git
 #        run: |
 #          git config --local user.name 'github-actions'
