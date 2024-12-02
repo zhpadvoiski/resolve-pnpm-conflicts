@@ -31,12 +31,9 @@ jobs:
           cache: pnpm
 
       - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
-
-#      - name: Setup git
-#        run: |
-#          git config --local user.name 'github-actions'
-#          git config --local user.email 'github-actions@users.noreply.github.com'
+        run: |
+          gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+          gh auth status
 
       - name: Check if PR has conflicts
         id: has-conflicts
