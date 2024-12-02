@@ -54,6 +54,7 @@ jobs:
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         id: conflicting-files
         run: |
+          git merge main
           conflicts=$(git diff --name-only --diff-filter=U)
           echo $conflicts
           echo "conflicts=$conflicts" >> $GITHUB_OUTPUT
