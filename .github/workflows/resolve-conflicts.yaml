@@ -39,6 +39,7 @@ jobs:
         id: has-conflicts
         run: |
           mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
+          echo $mergeable
           if [[ "$mergeable" == "CONFLICTING" ]]; then
             echo "::set-output name=has_conflicts::true"
           else
