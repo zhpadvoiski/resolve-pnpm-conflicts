@@ -67,6 +67,6 @@ jobs:
         run: |
           git checkout --ours package.json
           pnpm i --frozen-lockfile=false
-          git add pnpm-lock.yaml
+          git add *
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
           git push
