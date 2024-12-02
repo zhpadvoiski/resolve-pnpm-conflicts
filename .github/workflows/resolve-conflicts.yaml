@@ -63,11 +63,9 @@ jobs:
           echo "conflicts=pnpm-lock.yaml" >> $GITHUB_OUTPUT
 
       - name: Resolve pnpm-lock.yaml conflicts
-        run: echo ${{ steps.conflicting-files.outputs.conflicts }}
-
-      - name: Resolve pnpm-lock.yaml conflicts
         if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
         run: |
+          git checkout --ours package.json
           pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
