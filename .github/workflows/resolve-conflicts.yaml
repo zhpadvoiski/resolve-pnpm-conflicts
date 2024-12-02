@@ -12,8 +12,6 @@ jobs:
   resolve-pnpm-lock-conflicts:
     name: Resolve pnpm-lock Conflicts
     runs-on: ubuntu-latest
-    env:
-      PR_NUMBER=${{ github.event.inputs.prnumber }}
 
     steps:
       - name: Checkout repository
@@ -44,10 +42,14 @@ jobs:
           else
             echo "::set-output name=has_conflicts::false"
           fi
+        env:
+          PR_NUMBER=${{ github.event.inputs.prnumber }}
 
       - name: Checkout to the PR's branch
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         run: gh checkout $PR_NUMBER
+        env:
+          PR_NUMBER=${{ github.event.inputs.prnumber }}
 
       - name: Get conflicting files
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
