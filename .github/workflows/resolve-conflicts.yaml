@@ -12,8 +12,8 @@ jobs:
   resolve-pnpm-lock-conflicts:
     name: Resolve pnpm-lock Conflicts
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#    env:
+#      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -30,10 +30,13 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Setup git
-        run: |
-          git config --local user.name 'github-actions'
-          git config --local user.email 'github-actions@users.noreply.github.com'
+      - name: Authenticate with GitHub CLI
+        run: gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+
+#      - name: Setup git
+#        run: |
+#          git config --local user.name 'github-actions'
+#          git config --local user.email 'github-actions@users.noreply.github.com'
 
       - name: Check if PR has conflicts
         id: has-conflicts
