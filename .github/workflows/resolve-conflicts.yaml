@@ -60,7 +60,7 @@ jobs:
           git merge origin/main --allow-unrelated-histories || true
           conflicts=$(git diff --name-only --diff-filter=U)
           echo $conflicts
-          echo "conflicts=$conflicts" >> $GITHUB_OUTPUT
+          echo "conflicts='$conflicts'" >> $GITHUB_OUTPUT
 
       - name: Resolve pnpm-lock.yaml conflicts
         run: echo ${{ steps.conflicting-files.outputs.conflicts }}
