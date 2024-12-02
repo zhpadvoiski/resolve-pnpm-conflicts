@@ -56,7 +56,7 @@ jobs:
         run: |
           conflicts=$(git diff --name-only --diff-filter=U)
           echo $conflicts
-          echo "::set-output name=conflicts::$conflicts"
+          echo "conflicts=$conflicts" >> $GITHUB_OUTPUT
 
       - name: Resolve pnpm-lock.yaml conflicts
         if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
