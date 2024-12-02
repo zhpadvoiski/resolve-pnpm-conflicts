@@ -57,7 +57,7 @@ jobs:
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         id: conflicting-files
         run: |
-          git merge origin/main --allow-unrelated-histories
+          git merge origin/main --allow-unrelated-histories || true
           conflicts=$(git diff --name-only --diff-filter=U)
           echo $conflicts
           echo "conflicts=$conflicts" >> $GITHUB_OUTPUT
