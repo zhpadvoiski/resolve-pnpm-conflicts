@@ -34,6 +34,9 @@ jobs:
         run: |
           gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
           gh auth status
+          git config --local user.name 'github-actions'
+          git config --local user.email 'github-actions@users.noreply.github.com'
+  
 
       - name: Check if PR has conflicts
         id: has-conflicts
