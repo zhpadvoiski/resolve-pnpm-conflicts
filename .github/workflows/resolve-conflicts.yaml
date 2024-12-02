@@ -36,8 +36,6 @@ jobs:
           gh auth status
           git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@users.noreply.github.com'
-          git config advice.addIgnoredFile false
-  
 
       - name: Check if PR has conflicts
         id: has-conflicts
@@ -68,6 +66,6 @@ jobs:
         run: |
           git checkout --ours package.json
           pnpm i --frozen-lockfile=false
-          git add *
+          git add .
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
           git push
