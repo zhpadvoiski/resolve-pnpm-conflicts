@@ -33,6 +33,9 @@ jobs:
       - name: Authenticate with GitHub CLI
         run: gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
 
+      - name: Log git config
+        run: git config --list --show-origin
+
 #      - name: Setup git
 #        run: |
 #          git config --local user.name 'github-actions'
@@ -51,7 +54,7 @@ jobs:
 
       - name: Checkout to the PR's branch
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
-        run: gh checkout ${{ github.event.inputs.prnumber }}
+        run: gh pr checkout ${{ github.event.inputs.prnumber }}
 
       - name: Get conflicting files
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
