@@ -12,6 +12,8 @@ jobs:
   resolve-pnpm-lock-conflicts:
     name: Resolve pnpm-lock Conflicts
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout repository
