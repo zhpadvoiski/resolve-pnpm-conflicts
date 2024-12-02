@@ -1,0 +1,66 @@
+name: Handle pnpm-lock Conflicts
+
+on:
+  workflow_dispatch:
+    inputs:
+      prnumber:
+        description: Pull Request number
+        type: text
+        required: true
+
+jobs:
+  resolve-pnpm-lock-conflicts:
+    name: Resolve pnpm-lock Conflicts
+    runs-on: ubuntu-latest
+    env:
+      PR_NUMBER=${{ github.event.inputs.prnumber }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+#        with:
+#          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Setup node and pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: actions/setup-pnpm@v2
+
+      - name: Setup git
+        run: |
+          git config --local user.name 'github-actions'
+          git config --local user.email 'github-actions@users.noreply.github.com'
+
+      - name: Check if PR has conflicts
+        id: has-conflicts
+        run: |
+          mergeable=$(gh pr view "$PR_NUMBER" --json mergeable) --jq '.[] | .mergeable'
+          if [[ "$mergeable" == "CONFLICTING" ]]; then
+            echo "::set-output name=has_conflicts::true"
+          else
+            echo "::set-output name=has_conflicts::false"
+          fi
+
+      - name: Checkout to the PR's branch
+        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+        run: gh checkout $PR_NUMBER
+
+      - name: Get conflicting files
+        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+        id: conflicting-files
+        run: |
+          conflicts=$(git diff --name-only --diff-filter=U)
+          echo "::set-output name=conflicts::$conflicts"
+
+      - name: Resolve pnpm-lock.yaml conflicts
+        if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
+        run: |
+          git merge master
+          pnpm i --frozen-lockfile=false
+          git add pnpm-lock.yaml
+          git commit -m 'resolve conflicts in pnpm-lock.yaml'
+          git push
