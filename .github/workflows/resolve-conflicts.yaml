@@ -66,3 +66,5 @@ jobs:
           git add .
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
           git push
+        env:
+         GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
