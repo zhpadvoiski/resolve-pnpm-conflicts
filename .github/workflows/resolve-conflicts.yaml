@@ -41,9 +41,9 @@ jobs:
           mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
           echo $mergeable
           if [[ "$mergeable" == "CONFLICTING" ]]; then
-            echo "has_conflicts=true" >> $GITHUB_STATE
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
           else
-            echo "has_conflicts=false" >> $GITHUB_STATE
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout to the PR's branch
