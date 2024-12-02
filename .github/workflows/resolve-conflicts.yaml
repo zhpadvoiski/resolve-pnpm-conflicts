@@ -54,7 +54,7 @@ jobs:
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         id: conflicting-files
         run: |
-          git merge main
+          git merge origin/main
           conflicts=$(git diff --name-only --diff-filter=U)
           echo $conflicts
           echo "conflicts=$conflicts" >> $GITHUB_OUTPUT
@@ -62,11 +62,9 @@ jobs:
       - name: Resolve pnpm-lock.yaml conflicts
         run: echo ${{ steps.conflicting-files.outputs.conflicts }}
 
-
       - name: Resolve pnpm-lock.yaml conflicts
         if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
         run: |
-          git merge master
           pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
