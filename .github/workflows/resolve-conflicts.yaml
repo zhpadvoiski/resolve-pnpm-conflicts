@@ -26,7 +26,7 @@ jobs:
           cache: pnpm
 
       - name: Setup pnpm
-        uses: actions/setup-pnpm@v2
+        uses: pnpm/action-setup@v4
 
       - name: Setup git
         run: |
