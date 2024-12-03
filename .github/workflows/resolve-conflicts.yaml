@@ -13,13 +13,16 @@ jobs:
     name: Resolve pnpm-lock Conflicts
     runs-on: ubuntu-latest
     env:
-      PR_NUMBER=${{ github.event.inputs.prnumber }}
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-#        with:
-#          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup node and pnpm cache
         uses: actions/setup-node@v3
@@ -27,40 +30,42 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Setup pnpm
-        uses: actions/setup-pnpm@v2
-
-      - name: Setup git
+      - name: Authenticate with GitHub CLI
         run: |
+          gh auth status
           git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@users.noreply.github.com'
 
       - name: Check if PR has conflicts
         id: has-conflicts
         run: |
-          mergeable=$(gh pr view "$PR_NUMBER" --json mergeable) --jq '.[] | .mergeable'
+          mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
+          echo $mergeable
           if [[ "$mergeable" == "CONFLICTING" ]]; then
-            echo "::set-output name=has_conflicts::true"
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=has_conflicts::false"
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout to the PR's branch
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
-        run: gh checkout $PR_NUMBER
+        run: gh pr checkout ${{ github.event.inputs.prnumber }}
 
       - name: Get conflicting files
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         id: conflicting-files
         run: |
+          git merge origin/main --allow-unrelated-histories || true
           conflicts=$(git diff --name-only --diff-filter=U)
-          echo "::set-output name=conflicts::$conflicts"
+          echo $conflicts
+          echo "conflicts=pnpm-lock.yaml" >> $GITHUB_OUTPUT
 
       - name: Resolve pnpm-lock.yaml conflicts
         if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
         run: |
-          git merge master
+          git checkout --ours package.json
           pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
+          git reset HEAD -- ':!pnpm-lock.yaml'
           git commit -m 'resolve conflicts in pnpm-lock.yaml'
           git push
