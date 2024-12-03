@@ -8,7 +8,7 @@ const localFilename = 'package.json';
 const baseFilename = 'package.base.json'
 const theirsFilename = 'package.theirs.json'
 
-const allowedConflicts = ['package.json', 'pnpm-lock.yaml']
+const solvableConflicts = ['package.json', 'pnpm-lock.yaml']
 
 const run = (command) => {
     console.log(`Running ${command}`);
@@ -26,7 +26,7 @@ const run = (command) => {
 // }
 
 const conflictingFiles = run('git diff --name-only --diff-filter=U --relative')
-if(conflictingFiles.split('\n').filter(item => !!item).some(item => !allowedConflicts.includes(item))){
+if(conflictingFiles.split('\n').filter(item => !!item).some(item => !solvableConflicts.includes(item))){
     console.log("Unsolvable conflicts detected! Please solve them manually")
     process.exit(1)
 }
