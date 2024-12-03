@@ -12,8 +12,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       immer:
-        specifier: 4.0.0
-        version: 4.0.0
+        specifier: 6.0.0
+        version: 6.0.0
       jest:
         specifier: 29.6.2
         version: 29.6.2(@types/node@22.10.1)
@@ -962,8 +962,8 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  immer@4.0.0:
-    resolution: {integrity: sha512-374/m+biF/6Z24jiqR/u49SH095oIgYr/qLiQnR88svojs5RNJh/h9i0Qq0pqhgUon3Txx8PgUWH+obRy6jbKw==}
+  immer@6.0.0:
+    resolution: {integrity: sha512-vqOfnW3+VEV6vVxniMLPxTI+tEz1w7POYwOE1okOfnOS9Zl/mCObxino2lxiDC5l9o4NdWy+Rkxk9Em6ThBZBA==}
 
   import-local@3.2.0:
     resolution: {integrity: sha512-2SPlun1JUPWoM6t3F0dw0FkCF/jWY8kttcY4f599GLTSjh2OCuuhdTkJQsEcZzBqbXZGKMK2OqW1oZsjtf/gQA==}
@@ -3025,7 +3025,7 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  immer@4.0.0: {}
+  immer@6.0.0: {}
 
   import-local@3.2.0:
     dependencies:
