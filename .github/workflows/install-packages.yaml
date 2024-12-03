@@ -36,5 +36,8 @@ jobs:
         run: |
           pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
-          git commit -m 'update pnpm-lock.yaml'
+          git status --short
+          if [[ `git status --porcelain` ]]; then
+            git commit -m "update pnpm-lock.yaml"
+          fi
           git push
