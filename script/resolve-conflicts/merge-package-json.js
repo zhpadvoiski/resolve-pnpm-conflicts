@@ -15,15 +15,15 @@ const run = (command) => {
     return execSync(command).toString();
 }
 
-try {
-    run(`git fetch origin ${mainBranch}`)
-    run(`git merge origin/${mainBranch}`);
-
-    console.log('No conflicts detected, exiting...');
-    process.exit(0);
-} catch (err) {
-    console.error('Merge failed, resolving conflicts...\n');
-}
+// try {
+//     run(`git fetch origin ${mainBranch}`)
+//     run(`git merge origin/${mainBranch}`);
+//
+//     console.log('No conflicts detected, exiting...');
+//     process.exit(0);
+// } catch (err) {
+//     console.error('Merge failed, resolving conflicts...\n');
+// }
 
 const conflictingFiles = run('git diff --name-only --diff-filter=U --relative')
 if(conflictingFiles.split('\n').filter(item => !!item).some(item => !allowedConflicts.includes(item))){
@@ -42,4 +42,3 @@ const mergedJson = mergePackageJson(localJson, baseJson, theirsJson);
 fs.writeFileSync(localFilename, mergedJson, "utf-8");
 
 run('pnpm i --frozen-lockfile=false')
-run('git add package.json pnpm-lock.yaml')
