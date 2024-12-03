@@ -40,7 +40,7 @@ jobs:
         run: |
           gh pr checkout ${{ github.event.inputs.prnumber }}
           git checkout main pnpm-lock.yaml
-          git add pnpm-lock-yaml
+          git add pnpm-lock.yaml
           git status
           if [[ `git status --porcelain` ]]; then
             git commit -m 'get pnpm-lock.yaml from main branch'
