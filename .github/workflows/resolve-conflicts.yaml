@@ -61,7 +61,7 @@ jobs:
           node script/resolve-conflicts/merge-package-json.js
         
           git status --short
-          if [[ `git status --porcelain` ]] then;
+          if [[ `git status --porcelain` ]]; then
             git add package.json pnpm-lock.yaml
             git commit -m "resolve conflicts in package.json and pnpm-lock.yaml"
           fi
