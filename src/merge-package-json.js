@@ -16,7 +16,7 @@ const run = (command) => {
 }
 
 try {
-    run(`git fetch origin/${mainBranch}`)
+    run(`git fetch origin ${mainBranch}`)
     run(`git merge origin/${mainBranch}`);
 
     console.log('No conflicts detected, exiting...');
