@@ -22,7 +22,7 @@
     "mochawesome-json-to-md": "0.7.1",
     "moment": "2.0.0",
     "prettier": "2.0.0",
-    "react": "^18.3.1",
+    "react": "^17.3.1",
     "rimraf": "2.6.1",
     "semver": "^7.6.3",
     "size-limit": "5.0.0",
