@@ -20,7 +20,7 @@
     "mocha": "10.0.0",
     "mochawesome": "5.0.0",
     "mochawesome-json-to-md": "0.7.1",
-    "moment": "2.0.0",
+    "moment": "2.30.1",
     "prettier": "2.0.0",
     "react": "^18.3.1",
     "rimraf": "2.6.1",
