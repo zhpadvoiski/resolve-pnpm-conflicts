@@ -36,36 +36,47 @@ jobs:
           git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@users.noreply.github.com'
 
-      - name: Check if PR has conflicts
-        id: has-conflicts
+      - name: Get pnpm-lock.yaml from main branch
         run: |
-          mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
-          echo $mergeable
-          if [[ "$mergeable" == "CONFLICTING" ]]; then
-            echo "has_conflicts=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+          gh pr checkout ${{ github.event.inputs.prnumber }}
+          git checkout pnpm-lock.yaml main
+          git add pnpm-lock-yaml
+          git status
+          if [[ `git status --porcelain` ]]; then
+            git commit -m 'get pnpm-lock.yaml from main branch'
           fi
-
-      - name: Checkout to the PR's branch
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
-        run: gh pr checkout ${{ github.event.inputs.prnumber }}
-
-      - name: Get conflicting files
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
-        id: conflicting-files
-        run: |
-          git merge origin/main --allow-unrelated-histories || true
-          conflicts=$(git diff --name-only --diff-filter=U)
-          echo $conflicts
-          echo "conflicts=pnpm-lock.yaml" >> $GITHUB_OUTPUT
-
-      - name: Resolve pnpm-lock.yaml conflicts
-        if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
-        run: |
-          git checkout --ours package.json
-          pnpm i --frozen-lockfile=false
-          git add pnpm-lock.yaml
-          git reset HEAD -- ':!pnpm-lock.yaml'
-          git commit -m 'resolve conflicts in pnpm-lock.yaml'
           git push
+
+#      - name: Check if PR has conflicts
+#        id: has-conflicts
+#        run: |
+#          mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
+#          echo $mergeable
+#          if [[ "$mergeable" == "CONFLICTING" ]]; then
+#            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+#          else
+#            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+#          fi
+#
+#      - name: Checkout to the PR's branch
+#        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+#        run: gh pr checkout ${{ github.event.inputs.prnumber }}
+#
+#      - name: Get conflicting files
+#        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+#        id: conflicting-files
+#        run: |
+#          git merge origin/main --allow-unrelated-histories || true
+#          conflicts=$(git diff --name-only --diff-filter=U)
+#          echo $conflicts
+#          echo "conflicts=pnpm-lock.yaml" >> $GITHUB_OUTPUT
+#
+#      - name: Resolve pnpm-lock.yaml conflicts
+#        if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
+#        run: |
+#          git checkout --ours package.json
+#          pnpm i --frozen-lockfile=false
+#          git add pnpm-lock.yaml
+#          git reset HEAD -- ':!pnpm-lock.yaml'
+#          git commit -m 'resolve conflicts in pnpm-lock.yaml'
+#          git push
