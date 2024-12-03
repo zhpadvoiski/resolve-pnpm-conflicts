@@ -39,7 +39,7 @@ jobs:
       - name: Get pnpm-lock.yaml from main branch
         run: |
           gh pr checkout ${{ github.event.inputs.prnumber }}
-          git merge main
+          git merge main --allow-unrelated-histories || true
           git checkout . ':!pnpm-lock.yaml'
           pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
