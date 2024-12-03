@@ -43,7 +43,7 @@ importers:
         version: 2.0.0
       react:
         specifier: ^17.0.0
-        version: 17.0.0
+        version: 17.0.2
       rimraf:
         specifier: 2.6.1
         version: 2.6.1
@@ -1632,8 +1632,8 @@ packages:
     resolution: {integrity: sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==}
     engines: {node: '>=0.10.0'}
 
-  react@17.0.0:
-    resolution: {integrity: sha512-rG9bqS3LMuetoSUKHN8G3fMNuQOePKDThK6+2yXFWtoeTDLVNh/QCaxT+Jr+rNf4lwNXpx+atdn3Aa0oi8/6eQ==}
+  react@17.0.2:
+    resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
     engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
@@ -3968,7 +3968,7 @@ snapshots:
       object-assign: 4.1.1
       prop-types: 15.8.1
 
-  react@17.0.0:
+  react@17.0.2:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1

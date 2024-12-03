@@ -39,13 +39,26 @@ jobs:
       - name: Get pnpm-lock.yaml from main branch
         run: |
           gh pr checkout ${{ github.event.inputs.prnumber }}
-          git checkout main pnpm-lock.yaml
+          git merge main --allow-unrelated-histories || true
+          git checkout . ':!pnpm-lock.yaml'
+          pnpm i --frozen-lockfile=false
           git add pnpm-lock.yaml
-          git status
+          git status --short
           if [[ `git status --porcelain` ]]; then
-            git commit -m 'get pnpm-lock.yaml from main branch'
+            git commit -m 'resolve pnpm-lock.yaml'
           fi
           git push
+
+#      - name: Get pnpm-lock.yaml from main branch
+#        run: |
+#          gh pr checkout ${{ github.event.inputs.prnumber }}
+#          git checkout main pnpm-lock.yaml
+#          git add pnpm-lock.yaml
+#          git status
+#          if [[ `git status --porcelain` ]]; then
+#            git commit -m 'get pnpm-lock.yaml from main branch'
+#          fi
+#          git push
 
 #      - name: Check if PR has conflicts
 #        id: has-conflicts
