@@ -27,7 +27,7 @@ importers:
         specifier: 14.0.0
         version: 14.0.0
       merge-package.json:
-        specifier: ^7.0.1
+        specifier: 7.0.1
         version: 7.0.1
       mocha:
         specifier: 10.0.0
