@@ -1,0 +1,40 @@
+name: Install packages
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - package.json
+
+jobs:
+  resolve-pnpm-lock-conflicts:
+    name: Resolve pnpm-lock Conflicts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node and pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Authenticate with GitHub CLI
+        run: |
+          gh auth status
+          git config --local user.name 'github-actions'
+          git config --local user.email 'github-actions@users.noreply.github.com'
+
+      - name: Install Packages
+        run: |
+          pnpm i --frozen-lockfile=false
+          git add pnpm-lock.yaml
+          git commit -m 'update pnpm-lock.yaml'
+          git push
