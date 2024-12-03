@@ -58,7 +58,7 @@ jobs:
           git fetch origin main
           git merge origin/main || true
           git checkout --ours package.json
-          node merge-package-json.js
+          node script/resolve-conflicts/merge-package-json.js
         
           git status --short
           if [[ `git status --porcelain` ]] then;
