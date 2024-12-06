@@ -12,75 +12,16 @@ on:
     branches: [main]
 
 jobs:
-  resolve-pnpm-lock-conflicts:
-    name: Resolve pnpm-lock Conflicts
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          fetch-depth: 0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup node and pnpm cache
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install packages
-        run: pnpm i
-
-      - name: Authenticate with GitHub CLI
-        run: |
-          gh auth status
-          git config --local user.name 'github-actions'
-          git config --local user.email 'github-actions@users.noreply.github.com'
-
-      - name: Check if PR has conflicts
-        id: has-conflicts
-        run: |
-          mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
-          echo $mergeable
-          if [[ "$mergeable" == "CONFLICTING" ]]; then
-            echo "has_conflicts=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_conflicts=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Attempt to resolve conflicts
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
-        run: |
-          gh pr checkout ${{ github.event.inputs.prnumber }}
-          git fetch origin main
-          git merge origin/main || true
-          git checkout --ours package.json
-          node script/resolve-conflicts/merge-package-json.js
-        
-          git status --short
-          if [[ `git status --porcelain` ]]; then
-            git add package.json pnpm-lock.yaml
-            git commit -m "resolve conflicts in package.json and pnpm-lock.yaml"
-          fi
-          git push
-
   resolve-pnpm-lock-conflicts-push:
     name: Resolve pnpm-lock Conflicts
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
     steps:
       - name: Wait for 1 minute
-        run: sleep 60
+        if: github.event_name == 'push'
+        run: sleep 30
 
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -109,11 +50,16 @@ jobs:
       - name: Grab next in PR in the queue
         id: pr_number
         run: |
-          pr_number=$(gh pr list --state open --label 'READY FOR MERGE' --label 'QUEUED FOR MERGE #1' --json number --jq '.[] | .number')
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            pr_number=${{ github.event.inputs.pr_number }}
+          elif [[ "${{ github.event_name }}" == "push" ]]
+            pr_number=$(gh pr list --state open --label 'READY FOR MERGE' --label 'QUEUED FOR MERGE #1' --json number --jq '.[] | .number')
+          fi
+  
           if [[ `pr_number` ]]; then
             echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
           else
-            echo "Didn't find PR with QUEUED FOR MERGE \#1 label" 
+            echo "Didn't find PR to resolve conflicts" 
             exit 1
           fi
 
@@ -143,49 +89,3 @@ jobs:
             git commit -m "resolve conflicts in package.json and pnpm-lock.yaml"
           fi
           git push
-
-
-#      - name: Get pnpm-lock.yaml from main branch
-#        run: |
-#          gh pr checkout ${{ github.event.inputs.prnumber }}
-#          git checkout main pnpm-lock.yaml
-#          git add pnpm-lock.yaml
-#          git status
-#          if [[ `git status --porcelain` ]]; then
-#            git commit -m 'get pnpm-lock.yaml from main branch'
-#          fi
-#          git push
-
-#      - name: Check if PR has conflicts
-#        id: has-conflicts
-#        run: |
-#          mergeable=$(gh pr view ${{ github.event.inputs.prnumber }} --json mergeable --jq '.mergeable')
-#          echo $mergeable
-#          if [[ "$mergeable" == "CONFLICTING" ]]; then
-#            echo "has_conflicts=true" >> $GITHUB_OUTPUT
-#          else
-#            echo "has_conflicts=false" >> $GITHUB_OUTPUT
-#          fi
-#
-#      - name: Checkout to the PR's branch
-#        if: steps.has-conflicts.outputs.has_conflicts == 'true'
-#        run: gh pr checkout ${{ github.event.inputs.prnumber }}
-#
-#      - name: Get conflicting files
-#        if: steps.has-conflicts.outputs.has_conflicts == 'true'
-#        id: conflicting-files
-#        run: |
-#          git merge origin/main --allow-unrelated-histories || true
-#          conflicts=$(git diff --name-only --diff-filter=U)
-#          echo $conflicts
-#          echo "conflicts=pnpm-lock.yaml" >> $GITHUB_OUTPUT
-#
-#      - name: Resolve pnpm-lock.yaml conflicts
-#        if: contains(steps.conflicting-files.outputs.conflicts, 'pnpm-lock.yaml')
-#        run: |
-#          git checkout --ours package.json
-#          pnpm i --frozen-lockfile=false
-#          git add pnpm-lock.yaml
-#          git reset HEAD -- ':!pnpm-lock.yaml'
-#          git commit -m 'resolve conflicts in pnpm-lock.yaml'
-#          git push
