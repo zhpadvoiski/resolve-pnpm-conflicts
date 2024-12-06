@@ -2,7 +2,7 @@ name: Manage Merge Queue
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
     types: [synchronize, labeled, unlabeled, closed]
 
 concurrency:
@@ -12,7 +12,7 @@ concurrency:
 jobs:
   manage:
     if: ${{ !github.event.pull_request.draft && (!github.event.label || (github.event.label.name == 'READY FOR MERGE' || github.event.label.name == 'JUMP THE QUEUE')) }}
-    runs-on: eg-default
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
