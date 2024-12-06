@@ -51,7 +51,7 @@ jobs:
         id: pr_number
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            pr_number=${{ github.event.inputs.pr_number }}
+            pr_number="${{ github.event.inputs.pr_number }}"
           elif [[ "${{ github.event_name }}" == "push" ]]
             pr_number=$(gh pr list --state open --label 'READY FOR MERGE' --label 'QUEUED FOR MERGE #1' --json number --jq '.[] | .number')
           fi
