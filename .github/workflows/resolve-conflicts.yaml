@@ -54,7 +54,8 @@ jobs:
           echo $mergeable
           
           if [[ "$mergeable" == "UNKNOWN" ]]; then
-             mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
+            sleep 30
+            mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
           fi
           echo $mergeable
           
