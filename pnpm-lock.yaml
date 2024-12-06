@@ -21,8 +21,8 @@ importers:
         specifier: 22.0.0
         version: 22.0.0
       jest-localstorage-mock:
-        specifier: 2.4.24
-        version: 2.4.24
+        specifier: 2.4.26
+        version: 2.4.26
       lint-staged:
         specifier: 15.2.2
         version: 15.2.2
@@ -1276,8 +1276,8 @@ packages:
     resolution: {integrity: sha512-kYA8IJcSYtST2BY9I+SMC32nDpBT3J2NvWJx8+JCuCdl/CR1I4EKUJROiP8XtCcxqgTTBGJNdbB1A8XRKbTetw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
-  jest-localstorage-mock@2.4.24:
-    resolution: {integrity: sha512-oOyg/huzwFybNNDPgzvTKEbsfmFxl6zXjCZBCo31xPXmLDKWL9piDMVcWVWs/HanjlaecGOQjhkVS1ptv5NZqA==}
+  jest-localstorage-mock@2.4.26:
+    resolution: {integrity: sha512-owAJrYnjulVlMIXOYQIPRCCn3MmqI3GzgfZCXdD3/pmwrIvFMXcKVWZ+aMc44IzaASapg0Z4SEFxR+v5qxDA2w==}
     engines: {node: '>=6.16.0'}
 
   jest-matcher-utils@29.7.0:
@@ -3636,7 +3636,7 @@ snapshots:
       jest-get-type: 29.6.3
       pretty-format: 29.7.0
 
-  jest-localstorage-mock@2.4.24: {}
+  jest-localstorage-mock@2.4.26: {}
 
   jest-matcher-utils@29.7.0:
     dependencies:
