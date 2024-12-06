@@ -19,10 +19,6 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
     steps:
-      - name: Wait for 1 minute
-        if: github.event_name == 'push'
-        run: sleep 60
-
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
