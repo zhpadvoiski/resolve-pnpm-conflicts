@@ -19,6 +19,10 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
     steps:
+      - name: Wait for 1 minute
+        if: github.event_name == 'push'
+        run: sleep 60
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -54,6 +58,7 @@ jobs:
           echo $mergeable
           
           if [[ "$mergeable" == "UNKNOWN" ]]; then
+            echo "wait for 30 seconds..."
             sleep 30
             mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
           fi
@@ -83,7 +88,7 @@ jobs:
       - name: Attempt to resolve conflicts
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
         run: |
-          gh pr checkout ${{ github.event.inputs.prnumber }}
+          gh pr checkout ${{ steps.pr_number.outputs.pr_number }}
           git fetch origin main
           git merge origin/main || true
           git checkout --ours package.json
