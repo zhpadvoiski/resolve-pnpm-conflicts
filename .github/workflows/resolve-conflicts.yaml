@@ -61,8 +61,8 @@ jobs:
             echo "wait for 30 seconds..."
             sleep 30
             mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
+            echo $mergeable
           fi
-          echo $mergeable
           
           if [[ "$mergeable" == "CONFLICTING" ]]; then
             echo "has_conflicts=true" >> $GITHUB_OUTPUT
