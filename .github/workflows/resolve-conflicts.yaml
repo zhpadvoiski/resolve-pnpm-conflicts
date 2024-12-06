@@ -12,6 +12,13 @@ on:
     branches: [main]
 
 jobs:
+  log-event:
+    runs-on: ubuntu-latest
+    name: Log event name
+    steps:
+      - name: log event name
+        run: echo ${{ github.event_name }}
+
   resolve-pnpm-lock-conflicts:
     name: Resolve pnpm-lock Conflicts
     if: github.event_name == 'workflow_dispatch'
