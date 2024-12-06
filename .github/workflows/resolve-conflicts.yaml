@@ -12,13 +12,6 @@ on:
     branches: [main]
 
 jobs:
-  log-event:
-    runs-on: ubuntu-latest
-    name: Log event name
-    steps:
-      - name: log event name
-        run: echo ${{ github.event_name }}
-
   resolve-pnpm-lock-conflicts:
     name: Resolve pnpm-lock Conflicts
     if: github.event_name == 'workflow_dispatch'
@@ -77,13 +70,10 @@ jobs:
             git commit -m "resolve conflicts in package.json and pnpm-lock.yaml"
           fi
           git push
-          
-
-
 
   resolve-pnpm-lock-conflicts-push:
     name: Resolve pnpm-lock Conflicts
-    if: github.event_name == 'workflow_push'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
