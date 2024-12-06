@@ -29,18 +29,6 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup node and pnpm cache
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install packages
-        run: pnpm i
-
       - name: Authenticate with GitHub CLI
         run: |
           gh auth status
@@ -73,6 +61,21 @@ jobs:
           else
             echo "has_conflicts=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Setup pnpm
+        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node and pnpm cache
+        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install packages
+        if: steps.has-conflicts.outputs.has_conflicts == 'true'
+        run: pnpm i
 
       - name: Attempt to resolve conflicts
         if: steps.has-conflicts.outputs.has_conflicts == 'true'
