@@ -1,0 +1,25 @@
+name: Manage Merge Queue
+
+on:
+  pull_request:
+    branches: [main]
+    types: [synchronize, labeled, unlabeled, closed]
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: false
+
+jobs:
+  manage:
+    if: ${{ !github.event.pull_request.draft && (!github.event.label || (github.event.label.name == 'READY FOR MERGE' || github.event.label.name == 'JUMP THE QUEUE')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ExpediaGroup/github-helpers@v1
+        with:
+          helper: manage-merge-queue
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          login: ${{ github.event.pull_request.user.login }}
+          no_evict_upon_conflict: true
