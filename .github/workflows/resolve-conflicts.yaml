@@ -12,17 +12,66 @@ on:
     branches: [main]
 
 jobs:
-  resolve-pnpm-lock-conflicts-push:
-    name: Resolve pnpm-lock Conflicts
+  conflicts:
+    name: Identify conflicts
     runs-on: ubuntu-latest
+    outputs:
+      has_conflicts: ${{ steps.has-conflicts.outputs.has_conflicts }}
+      pr_number: ${{ steps.pr-number.outputs.pr_number }}
     env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
-      - name: Wait for 1 minute
+      - name: Wait for 1 sec
         if: github.event_name == 'push'
-        run: sleep 60
+        run: sleep 1
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Grab PR number
+        id: pr-number
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            pr_number="${{ github.event.inputs.prnumber }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            pr_number=$(gh pr list --state open --label 'READY FOR MERGE' --label 'QUEUED FOR MERGE #1' --json number --jq '.[] | .number')
+          fi
+  
+          if [[ "$pr_number" ]]; then
+            echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
+          else
+            echo "Didn't find PR to resolve conflicts" 
+            exit 0
+          fi
+
+      - name: Check if PR has conflicts
+        id: has-conflicts
+        run: |
+          mergeable=$(gh pr view ${{ steps.pr-number.outputs.pr_number }} --json mergeable --jq '.mergeable')
+          echo $mergeable
+          
+          if [[ "$mergeable" == "UNKNOWN" ]]; then
+            echo "wait for 30 seconds..."
+            sleep 30
+            mergeable=$(gh pr view ${{ steps.pr-number.outputs.pr_number }} --json mergeable --jq '.mergeable')
+            echo $mergeable
+          fi
+          
+          if [[ "$mergeable" == "CONFLICTING" ]]; then
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+          fi
+
+  resolve-conflicts:
+    name: Resolve conflicts
+    needs: conflicts
+    if: ${{ needs.conflicts.outputs.has_conflicts == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -35,60 +84,21 @@ jobs:
           git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@users.noreply.github.com'
 
-      - name: Grab next in PR in the queue
-        id: pr_number
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            pr_number="${{ github.event.inputs.prnumber }}"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            pr_number=$(gh pr list --state open --label 'READY FOR MERGE' --label 'QUEUED FOR MERGE #1' --json number --jq '.[] | .number')
-          fi
-  
-          if [[ "$pr_number" ]]; then
-            echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
-          else
-            echo "Didn't find PR to resolve conflicts" 
-            exit 1
-          fi
-
-      - name: Check if PR has conflicts
-        id: has-conflicts
-        run: |
-          mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
-          echo $mergeable
-          
-          if [[ "$mergeable" == "UNKNOWN" ]]; then
-            echo "wait for 30 seconds..."
-            sleep 30
-            mergeable=$(gh pr view ${{ steps.pr_number.outputs.pr_number }} --json mergeable --jq '.mergeable')
-            echo $mergeable
-          fi
-          
-          if [[ "$mergeable" == "CONFLICTING" ]]; then
-            echo "has_conflicts=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_conflicts=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Setup pnpm
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup node and pnpm cache
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install packages
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
         run: pnpm i
 
       - name: Attempt to resolve conflicts
-        if: steps.has-conflicts.outputs.has_conflicts == 'true'
         run: |
-          gh pr checkout ${{ steps.pr_number.outputs.pr_number }}
+          gh pr checkout ${{ needs.conflicts.outputs.pr_number }}
           git fetch origin main
           git merge origin/main || true
           git checkout --ours package.json
