@@ -29,12 +29,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Authenticate with GitHub CLI
-        run: |
-          gh auth status
-          git config --local user.name 'github-actions'
-          git config --local user.email 'github-actions@users.noreply.github.com'
-
       - name: Grab PR number
         id: pr-number
         run: |
@@ -83,6 +77,12 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0
+
+      - name: Authenticate with GitHub CLI
+        run: |
+          gh auth status
+          git config --local user.name 'github-actions'
+          git config --local user.email 'github-actions@users.noreply.github.com'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
