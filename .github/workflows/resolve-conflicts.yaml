@@ -26,12 +26,6 @@ jobs:
         if: github.event_name == 'push'
         run: sleep 60
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          fetch-depth: 0
-
       - name: Authenticate with GitHub CLI
         run: |
           gh auth status
@@ -79,6 +73,12 @@ jobs:
     if: ${{ needs.conflicts.outputs.has_conflicts == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
