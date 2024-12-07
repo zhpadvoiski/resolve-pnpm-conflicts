@@ -57,13 +57,13 @@ jobs:
       - name: Check if PR has conflicts
         id: has-conflicts
         run: |
-          mergeable=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+          mergeable=$(gh pr view ${{ steps.pr-number.outputs.pr_number }} --json mergeable --jq '.mergeable')
           echo $mergeable
           
           if [[ "$mergeable" == "UNKNOWN" ]]; then
             echo "wait for 30 seconds..."
             sleep 30
-            mergeable=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+            mergeable=$(gh pr view ${{ steps.pr-number.outputs.pr_number }} --json mergeable --jq '.mergeable')
             echo $mergeable
           fi
           
