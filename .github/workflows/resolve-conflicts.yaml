@@ -19,7 +19,7 @@ jobs:
       has_conflicts: ${{ steps.has-conflicts.outputs.has_conflicts }}
       pr_number: ${{ steps.pr-number.outputs.pr_number }}
     env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Wait for 1 minute
@@ -28,15 +28,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          fetch-depth: 0
-
-      - name: Authenticate with GitHub CLI
-        run: |
-          gh auth status
-          git config --local user.name 'github-actions'
-          git config --local user.email 'github-actions@users.noreply.github.com'
 
       - name: Grab PR number
         id: pr-number
@@ -78,7 +69,21 @@ jobs:
     needs: conflicts
     if: ${{ needs.conflicts.outputs.has_conflicts == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
+
+      - name: Authenticate with GitHub CLI
+        run: |
+          gh auth status
+          git config --local user.name 'github-actions'
+          git config --local user.email 'github-actions@users.noreply.github.com'
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
