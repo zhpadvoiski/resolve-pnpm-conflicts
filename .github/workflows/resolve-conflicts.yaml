@@ -19,7 +19,7 @@ jobs:
       has_conflicts: ${{ steps.has-conflicts.outputs.has_conflicts }}
       pr_number: ${{ steps.pr-number.outputs.pr_number }}
     env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Wait for 1 minute
@@ -75,6 +75,8 @@ jobs:
     needs: conflicts
     if: ${{ needs.conflicts.outputs.has_conflicts == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
