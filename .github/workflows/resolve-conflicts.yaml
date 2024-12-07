@@ -72,7 +72,7 @@ jobs:
   resolve-conflicts:
     name: Resolve conflicts
     needs: conflicts
-    if: ${{ env.has_conflicts == 'true '}}
+    if: ${{ env.has_conflicts == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup pnpm
