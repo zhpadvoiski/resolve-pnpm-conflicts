@@ -20,6 +20,6 @@ jobs:
       - uses: ExpediaGroup/github-helpers@v1
         with:
           helper: manage-merge-queue
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           login: ${{ github.event.pull_request.user.login }}
           no_evict_upon_conflict: true
